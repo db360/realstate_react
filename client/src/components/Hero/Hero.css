@@ -32,7 +32,8 @@
     border-radius: 999px;
     position: absolute;
     right: 28%;
-    top: -3%;
+    top: -10%;
+    z-index: -1;
 }
 /* Right Side */
 

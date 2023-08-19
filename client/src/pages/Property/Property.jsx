@@ -6,8 +6,12 @@ import { AiFillHeart, AiTwotoneCar } from "react-icons/ai";
 import { MdLocationPin, MdMeetingRoom } from "react-icons/md";
 import { FaShower } from "react-icons/fa";
 
+import { useState } from "react";
 import "./Property.css";
 import Map from "../../components/Map/Map";
+import useAuthCheck from "../../hooks/useAuthCheck";
+import { useAuth0 } from "@auth0/auth0-react";
+import BookingModal from "../../components/BookingModal/BookingModal";
 
 const Property = () => {
   const { pathname } = useLocation();
@@ -16,6 +20,10 @@ const Property = () => {
   const { data, isLoading, isError } = useQuery(["resd", id], () =>
     getProperty(id)
   );
+
+  const [modalOpened, setModalOpened] = useState(false);
+  const { validateLogin } = useAuthCheck();
+  const { user } = useAuth0()
 
   if (isLoading) {
     return (
@@ -76,38 +84,50 @@ const Property = () => {
             </div>
 
             {/* description */}
-            <span className="secondaryText" style={{ textAlign: "justify"}}>
+            <span className="secondaryText" style={{ textAlign: "justify" }}>
               {data?.description}
             </span>
 
             {/* address */}
-            <div className="flexStart" style={{gap: "1rem"}}>
+            <div className="flexStart" style={{ gap: "1rem" }}>
               <MdLocationPin size={25} />
               <span className="secondaryText">
-                {
-                  data?.address
-                }
-                {
-                  data?.city
-                }
-                {
-                  data?.country 
-                }
+                {data?.address}
+                {data?.city}
+                {data?.country}
               </span>
             </div>
 
             {/* booking Button */}
-            <button className="button"> Book Your Visit</button>
+
+            <button
+              className="button"
+              onClick={() => {
+                validateLogin() && setModalOpened(true);
+              }}
+            >
+              Book Your Visit
+            </button>
+
+            <BookingModal 
+              opened={modalOpened}
+              setOpened={setModalOpened}
+              propertyId={id}
+              email={user?.email}
+            />
           </div>
 
           {/* right side */}
           <div className="right">
-            <Map address={data?.address} city={data?.city} country={data?.country}/>
-          </div>
-            
+            <Map
+              address={data?.address}
+              city={data?.city}
+              country={data?.country}
+            />
           </div>
         </div>
       </div>
+    </div>
   );
 };
 
